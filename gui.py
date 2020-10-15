@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.8
 # -*- coding: utf-8 -*-
 __author__ = 'PykhovaOlga'
 from threading import Thread
@@ -8,10 +8,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets, Qt
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject
 from PyQt5.QtGui import QBrush, QPalette
 from PyQt5.QtGui import QPainter, QColor
-from main import BOLVANIZATOR
+from main import CHANGER_FW
 dict_t = {}
 dict_t['main_table'] = {}
-for i in range (1, 23):
+for i in range(1, 23):
     dict_t['main_table'][i] = {'port': i,
                                'status_port':  '',
                                'IP_switch': '',
@@ -32,12 +32,12 @@ class Ui_MainWindow(QObject):
         self.thread = QtCore.QThread()
 
         self.setupUi(MainWindow)
-        self.ex = BOLVANIZATOR()
+        self.ex = CHANGER_FW()
         self.ex.moveToThread(self.thread)
-        self.ex.mysignal.connect(self.print_table)
-        self.ex.button_sig.connect(self.enable_button)
-        self.ex.after_sig.connect(self.after)
-        self.ex.final.connect(self.finish)
+        self.ex.S_SIG.connect(self.print_table)
+        self.ex.BUTTON_SIG.connect(self.enable_button)
+        self.ex.AFTER_S_SIG.connect(self.after)
+        self.ex.FINAL_SIG.connect(self.finish)
 
         print(self.ip.text())
         self.ip.textChanged.connect(self.change_ip)
@@ -51,7 +51,7 @@ class Ui_MainWindow(QObject):
         self.pushButton.setText("Ожидайте")
         self.pushButton.setEnabled(False)
 
-        self.thread.started.connect(self.ex.run_action)
+        self.thread.started.connect(self.ex.prepare_upgrade)
         self.thread.start()
         self.pushButton.clicked.connect(self.run)
 
@@ -224,7 +224,7 @@ class Ui_MainWindow(QObject):
 
         self.thread_after = QtCore.QThread()
         self.ex.moveToThread(self.thread_after)
-        self.thread_after.started.connect(self.ex.obolvanit)
+        self.thread_after.started.connect(self.ex.upgrade_up)
         self.thread_after.start()
 
 
@@ -242,7 +242,7 @@ class Ui_MainWindow(QObject):
     @pyqtSlot()
     def change_port(self):
         try:
-            self.ex.set_port(int(self.start_port.text()), int(self.final_port.text()))
+            self.ex.set_range_ports(int(self.start_port.text()), int(self.final_port.text()))
         except Exception:
             pass
 
